@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали актива - KriptoExchange</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="icon-btn back-btn" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="asset-header-info">
+                    <div class="asset-icon" id="assetIcon">
+                        <i class="fab fa-bitcoin"></i>
+                    </div>
+                    <div class="asset-header-details">
+                        <div class="asset-name" id="assetName">Bitcoin</div>
+                        <div class="asset-symbol" id="assetSymbol">BTC</div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" onclick="shareAsset()">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Price Section -->
+            <section class="price-section">
+                <div class="current-price">
+                    <div class="price-amount" id="currentPrice">$43,250.00</div>
+                    <div class="price-change positive" id="priceChange">
+                        <i class="fas fa-arrow-up"></i>
+                        +$1,250.00 (+2.4%)
+                    </div>
+                </div>
+                <div class="price-stats">
+                    <div class="price-stat">
+                        <div class="stat-label">24ч макс</div>
+                        <div class="stat-value" id="max24h">$44,200</div>
+                    </div>
+                    <div class="price-stat">
+                        <div class="stat-label">24ч мин</div>
+                        <div class="stat-value" id="min24h">$42,100</div>
+                    </div>
+                    <div class="price-stat">
+                        <div class="stat-label">Объем</div>
+                        <div class="stat-value" id="volume">$2.1B</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chart Section -->
+            <section class="chart-section">
+                <div class="chart-header">
+                    <h3>График цены</h3>
+                    <div class="time-tabs">
+                        <button class="time-tab active" data-period="1D">1Д</button>
+                        <button class="time-tab" data-period="1W">1Н</button>
+                        <button class="time-tab" data-period="1M">1М</button>
+                        <button class="time-tab" data-period="1Y">1Г</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Trading Actions -->
+            <section class="trading-actions">
+                <div class="action-buttons">
+                    <button class="action-btn buy" onclick="openTradeModal('buy')">
+                        <i class="fas fa-arrow-down"></i>
+                        Купить
+                    </button>
+                    <button class="action-btn sell" onclick="openTradeModal('sell')">
+                        <i class="fas fa-arrow-up"></i>
+                        Продать
+                    </button>
+                </div>
+            </section>
+
+            <!-- Staking Section -->
+            <section class="staking-section">
+                <div class="staking-card">
+                    <h3>Стейкинг</h3>
+                    <div class="staking-info">
+                        <div class="staking-label">Сумма ставки</div>
+                        <div class="staking-input">
+                            <input type="number" id="stakeAmount" placeholder="0.00" value="100">
+                            <span class="currency">USD</span>
+                        </div>
+                    </div>
+                    
+                    <div class="staking-direction">
+                        <div class="direction-label">Направление</div>
+                        <div class="direction-buttons">
+                            <button class="direction-btn up active" onclick="selectDirection('up')">
+                                <i class="fas fa-arrow-up"></i>
+                                Вверх
+                            </button>
+                            <button class="direction-btn down" onclick="selectDirection('down')">
+                                <i class="fas fa-arrow-down"></i>
+                                Вниз
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="staking-time">
+                        <div class="time-label">Время</div>
+                        <div class="time-buttons">
+                            <button class="time-btn active" data-time="1" onclick="selectStakeTime(1)">1 день</button>
+                            <button class="time-btn" data-time="2" onclick="selectStakeTime(2)">2 дня</button>
+                            <button class="time-btn" data-time="3" onclick="selectStakeTime(3)">3 дня</button>
+                        </div>
+                    </div>
+                    
+                    <div class="staking-preview">
+                        <div class="preview-item">
+                            <span>Потенциальная прибыль:</span>
+                            <span class="profit">+$85.00</span>
+                        </div>
+                    </div>
+                    
+                    <button class="staking-action-btn" onclick="placeStake()">
+                        <i class="fas fa-dice"></i>
+                        Разместить ставку
+                    </button>
+                </div>
+            </section>
+
+            <!-- Order Section -->
+            <section class="order-section">
+                <div class="order-card">
+                    <h3>Ордер</h3>
+                    <div class="order-type">
+                        <div class="type-label">Тип ордера</div>
+                        <div class="type-buttons">
+                            <button class="type-btn limit active" onclick="selectOrderType('limit')">Лимитный</button>
+                            <button class="type-btn stop" onclick="selectOrderType('stop')">Стоп-ордер</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Цена</label>
+                                <input type="number" id="orderPrice" placeholder="0.00" value="43250">
+                            </div>
+                            <div class="form-group">
+                                <label>Количество</label>
+                                <input type="number" id="orderQuantity" placeholder="0.00000000" value="0.001">
+                            </div>
+                        </div>
+                        
+                        <div class="order-total">
+                            <div class="total-label">Общая сумма:</div>
+                            <div class="total-value" id="orderTotal">$43.25</div>
+                        </div>
+                        
+                        <div class="order-actions">
+                            <button class="order-btn buy" onclick="createOrder('buy')">
+                                <i class="fas fa-arrow-down"></i>
+                                Купить
+                            </button>
+                            <button class="order-btn sell" onclick="createOrder('sell')">
+                                <i class="fas fa-arrow-up"></i>
+                                Продать
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn" data-page="coins">
+                <i class="fas fa-coins"></i>
+                <span>Монеты</span>
+            </button>
+            <button class="nav-btn" data-page="portfolio">
+                <i class="fas fa-briefcase"></i>
+                <span>Портфель</span>
+            </button>
+            <button class="nav-btn" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Trade Modal -->
+    <div class="modal" id="tradeModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="tradeModalTitle">Купить Bitcoin</h3>
+                <button class="icon-btn" onclick="closeModal('tradeModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="tradeForm">
+                    <div class="form-group">
+                        <label>Сумма (USD)</label>
+                        <input type="number" id="tradeAmount" placeholder="0.00" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Получите (BTC)</label>
+                        <input type="number" id="tradeReceive" placeholder="0.00000000" readonly>
+                    </div>
+                    
+                    <div class="trade-info">
+                        <div class="info-row">
+                            <span>Курс:</span>
+                            <span id="tradeRate">$43,250.00</span>
+                        </div>
+                        <div class="info-row">
+                            <span>Комиссия:</span>
+                            <span>$0.25</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="trade-btn primary" id="tradeSubmitBtn">Купить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // Переменные для страницы деталей актива
+        let selectedDirection = 'up';
+        let selectedTime = 1;
+        let selectedOrderType = 'limit';
+        let currentAsset = null;
+        let priceChart = null;
+
+        // Инициализация страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const savedUser = localStorage.getItem('currentUser');
+            if (!savedUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Получаем параметры из URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const assetId = urlParams.get('asset') || 'bitcoin';
+            
+            // Находим актив
+            currentAsset = assets.find(a => a.id === assetId);
+            if (!currentAsset) {
+                currentAsset = assets[0]; // По умолчанию Bitcoin
+            }
+
+            // Инициализируем страницу
+            initializeAsset();
+            initializeChart();
+            initializeTimeTabs();
+            initializeTradeForm();
+            updatePrice();
+            
+            // Обновляем цену каждые 5 секунд
+            setInterval(updatePrice, 5000);
+        });
+
+        function initializeAsset() {
+            if (!currentAsset) return;
+
+            // Обновляем заголовок
+            document.getElementById('assetName').textContent = currentAsset.name;
+            document.getElementById('assetSymbol').textContent = currentAsset.symbol;
+            document.getElementById('assetIcon').innerHTML = `<i class="${currentAsset.icon}"></i>`;
+            document.getElementById('assetIcon').style.background = currentAsset.color;
+
+            // Обновляем цену
+            updatePrice();
+            updateOrderTotal();
+        }
+
+        function initializeChart() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            
+            // Генерируем данные для графика
+            const labels = [];
+            const data = [];
+            const now = new Date();
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(now);
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' }));
+                
+                // Генерируем реалистичные данные
+                const basePrice = currentAsset.price;
+                const variation = (Math.random() - 0.5) * 0.1; // ±5%
+                data.push(basePrice * (1 + variation));
+            }
+
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Цена',
+                        data: data,
+                        borderColor: currentAsset.color,
+                        backgroundColor: currentAsset.color + '20',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: currentAsset.color,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#8e8e93'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#2c2c2e'
+                            },
+                            ticks: {
+                                color: '#8e8e93',
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        function initializeTimeTabs() {
+            const timeTabs = document.querySelectorAll('.time-tab');
+            timeTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    timeTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const period = this.dataset.period;
+                    updateChart(period);
+                });
+            });
+        }
+
+        function updateChart(period) {
+            if (!priceChart) return;
+
+            // Генерируем новые данные в зависимости от периода
+            const labels = [];
+            const data = [];
+            const now = new Date();
+            
+            let days = 7;
+            if (period === '1W') days = 7;
+            else if (period === '1M') days = 30;
+            else if (period === '1Y') days = 365;
+            
+            for (let i = days; i >= 0; i--) {
+                const date = new Date(now);
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' }));
+                
+                const basePrice = currentAsset.price;
+                const variation = (Math.random() - 0.5) * 0.1;
+                data.push(basePrice * (1 + variation));
+            }
+
+            priceChart.data.labels = labels;
+            priceChart.data.datasets[0].data = data;
+            priceChart.update();
+        }
+
+        function updatePrice() {
+            if (!currentAsset) return;
+
+            // Симулируем изменение цены
+            const changePercent = (Math.random() - 0.5) * 2; // -1% до +1%
+            currentAsset.price *= (1 + changePercent / 100);
+            currentAsset.change = changePercent;
+
+            // Обновляем отображение
+            const priceEl = document.getElementById('currentPrice');
+            const changeEl = document.getElementById('priceChange');
+            
+            priceEl.textContent = `$${formatCurrency(currentAsset.price)}`;
+            
+            const changeAmount = currentAsset.price * (changePercent / 100);
+            if (changePercent >= 0) {
+                changeEl.innerHTML = `<i class="fas fa-arrow-up"></i> +$${formatCurrency(changeAmount)} (+${changePercent.toFixed(2)}%)`;
+                changeEl.className = 'price-change positive';
+            } else {
+                changeEl.innerHTML = `<i class="fas fa-arrow-down"></i> -$${formatCurrency(Math.abs(changeAmount))} (${changePercent.toFixed(2)}%)`;
+                changeEl.className = 'price-change negative';
+            }
+
+            // Обновляем статистику
+            document.getElementById('max24h').textContent = `$${formatCurrency(currentAsset.price * 1.02)}`;
+            document.getElementById('min24h').textContent = `$${formatCurrency(currentAsset.price * 0.98)}`;
+            document.getElementById('volume').textContent = `$${(Math.random() * 5 + 1).toFixed(1)}B`;
+
+            // Обновляем ордер
+            updateOrderTotal();
+        }
+
+        function initializeTradeForm() {
+            const tradeAmount = document.getElementById('tradeAmount');
+            const tradeReceive = document.getElementById('tradeReceive');
+            
+            tradeAmount.addEventListener('input', updateTradeReceive);
+            
+            // Обработка формы торговли
+            const tradeForm = document.getElementById('tradeForm');
+            tradeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                executeTrade();
+            });
+        }
+
+        function updateTradeReceive() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+            const price = currentAsset.price;
+            const receive = amount / price;
+            
+            document.getElementById('tradeReceive').value = receive.toFixed(8);
+            document.getElementById('tradeRate').textContent = `$${formatCurrency(price)}`;
+        }
+
+        function openTradeModal(type) {
+            const modal = document.getElementById('tradeModal');
+            const title = document.getElementById('tradeModalTitle');
+            const submitBtn = document.getElementById('tradeSubmitBtn');
+            
+            if (type === 'buy') {
+                title.textContent = `Купить ${currentAsset.name}`;
+                submitBtn.textContent = 'Купить';
+                submitBtn.className = 'trade-btn primary';
+            } else {
+                title.textContent = `Продать ${currentAsset.name}`;
+                submitBtn.textContent = 'Продать';
+                submitBtn.className = 'trade-btn primary';
+            }
+            
+            modal.style.display = 'flex';
+            updateTradeReceive();
+        }
+
+        function executeTrade() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value);
+            const receive = parseFloat(document.getElementById('tradeReceive').value);
+            const type = document.getElementById('tradeSubmitBtn').textContent === 'Купить' ? 'buy' : 'sell';
+            
+            if (!amount || amount <= 0) {
+                showToast('Ошибка', 'Введите корректную сумму', 'error');
+                return;
+            }
+
+            // Проверяем баланс
+            const userBalance = parseFloat(localStorage.getItem('userBalance')) || 0;
+            if (type === 'buy' && amount > userBalance) {
+                showToast('Ошибка', 'Недостаточно средств', 'error');
+                return;
+            }
+
+            // Выполняем сделку
+            if (type === 'buy') {
+                // Покупаем актив
+                const userAssets = JSON.parse(localStorage.getItem('userAssets')) || [];
+                const existingAsset = userAssets.find(a => a.id === currentAsset.id);
+                
+                if (existingAsset) {
+                    existingAsset.balance += receive;
+                } else {
+                    userAssets.push({
+                        id: currentAsset.id,
+                        balance: receive
+                    });
+                }
+                
+                // Списываем с баланса
+                const newBalance = userBalance - amount;
+                localStorage.setItem('userBalance', newBalance.toString());
+                localStorage.setItem('userAssets', JSON.stringify(userAssets));
+                
+                // Добавляем транзакцию
+                addTransaction('Покупка ' + currentAsset.name, -amount, 'buy', amount);
+                
+                showToast('Успешно', `Куплено ${receive.toFixed(8)} ${currentAsset.symbol}`, 'success');
+            } else {
+                // Продаем актив
+                const userAssets = JSON.parse(localStorage.getItem('userAssets')) || [];
+                const existingAsset = userAssets.find(a => a.id === currentAsset.id);
+                
+                if (!existingAsset || existingAsset.balance < receive) {
+                    showToast('Ошибка', 'Недостаточно активов для продажи', 'error');
+                    return;
+                }
+                
+                existingAsset.balance -= receive;
+                if (existingAsset.balance <= 0) {
+                    userAssets.splice(userAssets.indexOf(existingAsset), 1);
+                }
+                
+                // Добавляем к балансу
+                const newBalance = userBalance + amount;
+                localStorage.setItem('userBalance', newBalance.toString());
+                localStorage.setItem('userAssets', JSON.stringify(userAssets));
+                
+                // Добавляем транзакцию
+                addTransaction('Продажа ' + currentAsset.name, amount, 'sell', amount);
+                
+                showToast('Успешно', `Продано ${receive.toFixed(8)} ${currentAsset.symbol}`, 'success');
+            }
+            
+            closeModal('tradeModal');
+        }
+
+        // Staking functions
+        function selectDirection(direction) {
+            selectedDirection = direction;
+            document.querySelectorAll('.direction-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.direction-btn.${direction}`).classList.add('active');
+            updateStakePreview();
+        }
+        
+        function selectStakeTime(time) {
+            selectedTime = time;
+            document.querySelectorAll('.staking-time .time-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-time="${time}"]`).classList.add('active');
+            updateStakePreview();
+        }
+        
+        function updateStakePreview() {
+            const amount = parseFloat(document.getElementById('stakeAmount').value) || 0;
+            const profit = amount * 0.85; // 85% profit for demo
+            document.querySelector('.profit').textContent = `+$${formatCurrency(profit)}`;
+        }
+        
+        function placeStake() {
+            const amount = parseFloat(document.getElementById('stakeAmount').value);
+            if (!amount || amount <= 0) {
+                showToast('Ошибка', 'Введите корректную сумму ставки', 'error');
+                return;
+            }
+            
+            // Проверяем баланс
+            const userBalance = parseFloat(localStorage.getItem('userBalance')) || 0;
+            if (amount > userBalance) {
+                showToast('Ошибка', 'Недостаточно средств', 'error');
+                return;
+            }
+            
+            // Создаем ставку
+            const stake = {
+                id: Date.now().toString(),
+                amount: amount,
+                direction: selectedDirection,
+                time: selectedTime,
+                startTime: Date.now(),
+                endTime: Date.now() + (selectedTime * 24 * 60 * 60 * 1000),
+                completed: false,
+                asset: currentAsset.id,
+                price: currentAsset.price
+            };
+            
+            // Списываем с баланса
+            const newBalance = userBalance - amount;
+            localStorage.setItem('userBalance', newBalance.toString());
+            
+            // Добавляем к активным ставкам
+            const activeStakes = JSON.parse(localStorage.getItem('activeStakes')) || [];
+            activeStakes.push(stake);
+            localStorage.setItem('activeStakes', JSON.stringify(activeStakes));
+            
+            // Добавляем транзакцию
+            addTransaction('Стейкинг', -amount, 'stake', amount);
+            
+            showToast('Успешно', `Ставка размещена на $${formatCurrency(amount)}`, 'success');
+            
+            // Показываем таймер
+            showStakeTimer(stake);
+        }
+        
+        // Order functions
+        function selectOrderType(type) {
+            selectedOrderType = type;
+            document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.type-btn.${type}`).classList.add('active');
+        }
+        
+        function updateOrderTotal() {
+            const price = parseFloat(document.getElementById('orderPrice').value) || 0;
+            const quantity = parseFloat(document.getElementById('orderQuantity').value) || 0;
+            const total = price * quantity;
+            
+            document.getElementById('orderTotal').textContent = `$${formatCurrency(total)}`;
+        }
+        
+        function createOrder(type) {
+            const price = parseFloat(document.getElementById('orderPrice').value);
+            const quantity = parseFloat(document.getElementById('orderQuantity').value);
+            
+            if (!price || !quantity || price <= 0 || quantity <= 0) {
+                showToast('Ошибка', 'Введите корректные значения цены и количества', 'error');
+                return;
+            }
+            
+            const total = price * quantity;
+            const userBalance = parseFloat(localStorage.getItem('userBalance')) || 0;
+            
+            if (type === 'buy' && total > userBalance) {
+                showToast('Ошибка', 'Недостаточно средств', 'error');
+                return;
+            }
+            
+            // Создаем ордер (упрощенно - сразу выполняем)
+            if (type === 'buy') {
+                const userAssets = JSON.parse(localStorage.getItem('userAssets')) || [];
+                const existingAsset = userAssets.find(a => a.id === currentAsset.id);
+                
+                if (existingAsset) {
+                    existingAsset.balance += quantity;
+                } else {
+                    userAssets.push({
+                        id: currentAsset.id,
+                        balance: quantity
+                    });
+                }
+                
+                const newBalance = userBalance - total;
+                localStorage.setItem('userBalance', newBalance.toString());
+                localStorage.setItem('userAssets', JSON.stringify(userAssets));
+                
+                addTransaction(`Ордер ${type === 'buy' ? 'покупки' : 'продажи'} ${currentAsset.name}`, -total, 'order', total);
+            } else {
+                const userAssets = JSON.parse(localStorage.getItem('userAssets')) || [];
+                const existingAsset = userAssets.find(a => a.id === currentAsset.id);
+                
+                if (!existingAsset || existingAsset.balance < quantity) {
+                    showToast('Ошибка', 'Недостаточно активов для продажи', 'error');
+                    return;
+                }
+                
+                existingAsset.balance -= quantity;
+                if (existingAsset.balance <= 0) {
+                    userAssets.splice(userAssets.indexOf(existingAsset), 1);
+                }
+                
+                const newBalance = userBalance + total;
+                localStorage.setItem('userBalance', newBalance.toString());
+                localStorage.setItem('userAssets', JSON.stringify(userAssets));
+                
+                addTransaction(`Ордер ${type === 'buy' ? 'покупки' : 'продажи'} ${currentAsset.name}`, total, 'order', total);
+            }
+            
+            showToast('Успешно', `Ордер ${type === 'buy' ? 'покупки' : 'продажи'} создан`, 'success');
+        }
+
+        function shareAsset() {
+            if (navigator.share) {
+                navigator.share({
+                    title: `${currentAsset.name} - ${currentAsset.symbol}`,
+                    text: `Текущая цена ${currentAsset.name}: $${formatCurrency(currentAsset.price)}`,
+                    url: window.location.href
+                });
+            } else {
+                showToast('Информация', 'Ссылка скопирована в буфер обмена', 'info');
+            }
+        }
+
+        // Добавляем обработчики событий для обновления
+        document.getElementById('stakeAmount').addEventListener('input', updateStakePreview);
+        document.getElementById('orderPrice').addEventListener('input', updateOrderTotal);
+        document.getElementById('orderQuantity').addEventListener('input', updateOrderTotal);
+    </script>
+</body>
+
+</html> 

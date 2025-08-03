@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки - KriptoExchange</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-title">Настройки</h1>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" onclick="saveSettings()">
+                    <i class="fas fa-save"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Profile Section -->
+            <section class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-info">
+                        <div class="profile-avatar" id="profileAvatar">U</div>
+                        <div class="profile-details">
+                            <div class="profile-name" id="profileName">Пользователь</div>
+                            <div class="profile-email" id="profileEmail">user@example.com</div>
+                        </div>
+                    </div>
+                    <button class="icon-btn" onclick="editProfile()">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section class="settings-section">
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="setting-details">
+                                <div class="setting-name">Уведомления</div>
+                                <div class="setting-description">Получать уведомления о транзакциях</div>
+                            </div>
+                        </div>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="notificationsToggle" checked>
+                            <label for="notificationsToggle"></label>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="setting-details">
+                                <div class="setting-name">Безопасность</div>
+                                <div class="setting-description">Двухфакторная аутентификация</div>
+                            </div>
+                        </div>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="securityToggle">
+                            <label for="securityToggle"></label>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="setting-details">
+                                <div class="setting-name">Приватность</div>
+                                <div class="setting-description">Скрывать баланс</div>
+                            </div>
+                        </div>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="privacyToggle">
+                            <label for="privacyToggle"></label>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="setting-details">
+                                <div class="setting-name">Тема</div>
+                                <div class="setting-description">Темная тема</div>
+                            </div>
+                        </div>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="themeToggle" checked>
+                            <label for="themeToggle"></label>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-language"></i>
+                            </div>
+                            <div class="setting-details">
+                                <div class="setting-name">Язык</div>
+                                <div class="setting-description">Русский</div>
+                            </div>
+                        </div>
+                        <button class="icon-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="setting-details">
+                                <div class="setting-name">Валюта</div>
+                                <div class="setting-description">USD</div>
+                            </div>
+                        </div>
+                        <button class="icon-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="setting-details">
+                                <div class="setting-name">Экспорт данных</div>
+                                <div class="setting-description">Скачать все данные</div>
+                            </div>
+                        </div>
+                        <button class="icon-btn" onclick="exportData()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="setting-details">
+                                <div class="setting-name">Помощь</div>
+                                <div class="setting-description">FAQ и поддержка</div>
+                            </div>
+                        </div>
+                        <button class="icon-btn" onclick="openHelp()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="setting-details">
+                                <div class="setting-name">О приложении</div>
+                                <div class="setting-description">Версия 1.0.0</div>
+                            </div>
+                        </div>
+                        <button class="icon-btn" onclick="showAbout()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Logout Section -->
+            <section class="logout-section">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Выйти из аккаунта
+                </button>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn" data-page="coins">
+                <i class="fas fa-coins"></i>
+                <span>Монеты</span>
+            </button>
+            <button class="nav-btn" data-page="portfolio">
+                <i class="fas fa-briefcase"></i>
+                <span>Портфель</span>
+            </button>
+            <button class="nav-btn active" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // Инициализация страницы настроек
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const savedUser = localStorage.getItem('currentUser');
+            if (!savedUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            initializeSettings();
+            initializeNavigation();
+            loadUserProfile();
+        });
+
+        function initializeSettings() {
+            // Загружаем сохраненные настройки
+            const settings = JSON.parse(localStorage.getItem('userSettings')) || {
+                notifications: true,
+                security: false,
+                privacy: false,
+                theme: true
+            };
+
+            // Применяем настройки к переключателям
+            document.getElementById('notificationsToggle').checked = settings.notifications;
+            document.getElementById('securityToggle').checked = settings.security;
+            document.getElementById('privacyToggle').checked = settings.privacy;
+            document.getElementById('themeToggle').checked = settings.theme;
+
+            // Добавляем обработчики событий
+            document.getElementById('notificationsToggle').addEventListener('change', function() {
+                settings.notifications = this.checked;
+                saveSettingsToStorage(settings);
+            });
+
+            document.getElementById('securityToggle').addEventListener('change', function() {
+                settings.security = this.checked;
+                saveSettingsToStorage(settings);
+            });
+
+            document.getElementById('privacyToggle').addEventListener('change', function() {
+                settings.privacy = this.checked;
+                saveSettingsToStorage(settings);
+            });
+
+            document.getElementById('themeToggle').addEventListener('change', function() {
+                settings.theme = this.checked;
+                saveSettingsToStorage(settings);
+            });
+        }
+
+        function loadUserProfile() {
+            const savedUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (savedUser) {
+                document.getElementById('profileName').textContent = savedUser.name;
+                document.getElementById('profileEmail').textContent = savedUser.email;
+                document.getElementById('profileAvatar').textContent = savedUser.name.charAt(0).toUpperCase();
+            }
+        }
+
+        function initializeNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const page = button.dataset.page;
+                    navigateToPage(page);
+                });
+            });
+        }
+
+        function saveSettings() {
+            const settings = {
+                notifications: document.getElementById('notificationsToggle').checked,
+                security: document.getElementById('securityToggle').checked,
+                privacy: document.getElementById('privacyToggle').checked,
+                theme: document.getElementById('themeToggle').checked
+            };
+
+            saveSettingsToStorage(settings);
+            showToast('Успешно', 'Настройки сохранены', 'success');
+        }
+
+        function saveSettingsToStorage(settings) {
+            localStorage.setItem('userSettings', JSON.stringify(settings));
+        }
+
+        function editProfile() {
+            showToast('Информация', 'Редактирование профиля будет доступно в ближайшее время', 'info');
+        }
+
+        function exportData() {
+            const userData = {
+                user: JSON.parse(localStorage.getItem('currentUser')),
+                balance: localStorage.getItem('userBalance'),
+                assets: JSON.parse(localStorage.getItem('userAssets')),
+                transactions: JSON.parse(localStorage.getItem('userTransactions')),
+                stakes: JSON.parse(localStorage.getItem('activeStakes')),
+                settings: JSON.parse(localStorage.getItem('userSettings'))
+            };
+
+            const dataStr = JSON.stringify(userData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kriptoexchange_data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast('Успешно', 'Данные экспортированы', 'success');
+        }
+
+        function openHelp() {
+            showToast('Информация', 'Справочный центр будет доступен в ближайшее время', 'info');
+        }
+
+        function showAbout() {
+            showToast('Информация', 'KriptoExchange v1.0.0\nСовременная платформа для торговли криптовалютами', 'info');
+        }
+
+        function logout() {
+            if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
+                // Очищаем данные пользователя
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('userBalance');
+                localStorage.removeItem('userAssets');
+                localStorage.removeItem('userTransactions');
+                localStorage.removeItem('activeStakes');
+                
+                // Перенаправляем на главную страницу
+                window.location.href = 'index.html';
+            }
+        }
+
+        function navigateToPage(page) {
+            if (page === 'home') {
+                window.location.href = 'index.html';
+            } else if (page === 'coins') {
+                window.location.href = 'coins.html';
+            } else if (page === 'portfolio') {
+                window.location.href = 'portfolio.html';
+            } else if (page === 'settings') {
+                window.location.href = 'settings.html';
+            }
+        }
+    </script>
+</body>
+
+</html> 

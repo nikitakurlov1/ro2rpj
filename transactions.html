@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Транзакции - KriptoExchange</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-title">Транзакции</h1>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" onclick="exportTransactions()">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">Все</button>
+                <button class="filter-tab" data-filter="buy">Покупки</button>
+                <button class="filter-tab" data-filter="sell">Продажи</button>
+                <button class="filter-tab" data-filter="deposit">Пополнения</button>
+                <button class="filter-tab" data-filter="withdraw">Выводы</button>
+                <button class="filter-tab" data-filter="stake">Стейкинг</button>
+                <button class="filter-tab" data-filter="order">Ордера</button>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <section class="summary-stats">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTransactions">0</div>
+                    <div class="stat-label">Всего транзакций</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalVolume">$0.00</div>
+                    <div class="stat-label">Общий объем</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgTransaction">$0.00</div>
+                    <div class="stat-label">Средняя транзакция</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Transactions List -->
+            <section class="transactions-section">
+                <div class="transactions-list" id="transactionsList">
+                    <!-- Transactions will be loaded dynamically -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn" data-page="coins">
+                <i class="fas fa-coins"></i>
+                <span>Монеты</span>
+            </button>
+            <button class="nav-btn" data-page="portfolio">
+                <i class="fas fa-briefcase"></i>
+                <span>Портфель</span>
+            </button>
+            <button class="nav-btn" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Transaction Details Modal -->
+    <div class="modal" id="transactionModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="transactionModalTitle">Детали транзакции</h3>
+                <button class="icon-btn" onclick="closeModal('transactionModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="transaction-details" id="transactionDetails">
+                    <!-- Transaction details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+    <script>
+        let currentFilter = 'all';
+        let allTransactions = [];
+
+        // Инициализация страницы транзакций
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const savedUser = localStorage.getItem('currentUser');
+            if (!savedUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            initializeTransactions();
+            initializeFilters();
+            initializeNavigation();
+        });
+
+        function initializeTransactions() {
+            // Загружаем транзакции пользователя
+            allTransactions = JSON.parse(localStorage.getItem('userTransactions')) || [];
+            
+            updateTransactionStats();
+            displayTransactions();
+        }
+
+        function updateTransactionStats() {
+            const totalTransactions = allTransactions.length;
+            const totalVolume = allTransactions.reduce((sum, t) => sum + Math.abs(t.usdAmount || 0), 0);
+            const avgTransaction = totalTransactions > 0 ? totalVolume / totalTransactions : 0;
+
+            document.getElementById('totalTransactions').textContent = totalTransactions;
+            document.getElementById('totalVolume').textContent = `$${formatCurrency(totalVolume)}`;
+            document.getElementById('avgTransaction').textContent = `$${formatCurrency(avgTransaction)}`;
+        }
+
+        function displayTransactions() {
+            const transactionsList = document.getElementById('transactionsList');
+            if (!transactionsList) return;
+
+            // Фильтруем транзакции
+            let filteredTransactions = allTransactions;
+            if (currentFilter !== 'all') {
+                filteredTransactions = allTransactions.filter(t => t.type === currentFilter);
+            }
+
+            if (filteredTransactions.length === 0) {
+                transactionsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <p>История транзакций пуста</p>
+                    </div>
+                `;
+                return;
+            }
+
+            transactionsList.innerHTML = filteredTransactions.map(transaction => `
+                <div class="transaction-item" onclick="openTransactionDetails('${transaction.id}')">
+                    <div class="transaction-icon ${transaction.type}">
+                        <i class="fas ${getTransactionIcon(transaction.type)}"></i>
+                    </div>
+                    <div class="transaction-info">
+                        <div class="transaction-title">${transaction.title}</div>
+                        <div class="transaction-time">${formatTime(transaction.timestamp)}</div>
+                    </div>
+                    <div class="transaction-amount">
+                        <div class="amount ${transaction.amount >= 0 ? 'positive' : 'negative'}">
+                            ${transaction.amount >= 0 ? '+' : ''}${transaction.amount > 0 ? '$' : ''}${formatTransactionAmount(transaction)}
+                        </div>
+                        <div class="amount-usd">${transaction.usdAmount ? '$' + formatCurrency(transaction.usdAmount) : ''}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function initializeFilters() {
+            const filterTabs = document.querySelectorAll('.filter-tab');
+            
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    filterTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentFilter = this.dataset.filter;
+                    displayTransactions();
+                });
+            });
+        }
+
+        function initializeNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const page = button.dataset.page;
+                    navigateToPage(page);
+                });
+            });
+        }
+
+        function openTransactionDetails(transactionId) {
+            const transaction = allTransactions.find(t => t.id === transactionId);
+            if (!transaction) return;
+
+            const modal = document.getElementById('transactionModal');
+            const title = document.getElementById('transactionModalTitle');
+            const details = document.getElementById('transactionDetails');
+
+            title.textContent = transaction.title;
+
+            const detailsHtml = `
+                <div class="detail-item">
+                    <div class="detail-label">Тип операции</div>
+                    <div class="detail-value">${getTransactionTypeName(transaction.type)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Сумма</div>
+                    <div class="detail-value ${transaction.amount >= 0 ? 'success' : ''}">
+                        ${transaction.amount >= 0 ? '+' : ''}${formatTransactionAmount(transaction)}
+                    </div>
+                </div>
+                ${transaction.usdAmount ? `
+                <div class="detail-item">
+                    <div class="detail-label">Сумма в USD</div>
+                    <div class="detail-value">$${formatCurrency(transaction.usdAmount)}</div>
+                </div>
+                ` : ''}
+                <div class="detail-item">
+                    <div class="detail-label">Дата и время</div>
+                    <div class="detail-value">${new Date(transaction.timestamp).toLocaleString('ru-RU')}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">ID транзакции</div>
+                    <div class="detail-value">${transaction.id}</div>
+                </div>
+            `;
+
+            details.innerHTML = detailsHtml;
+            modal.style.display = 'flex';
+        }
+
+        function getTransactionTypeName(type) {
+            const typeNames = {
+                'buy': 'Покупка',
+                'sell': 'Продажа',
+                'deposit': 'Пополнение',
+                'withdraw': 'Вывод',
+                'stake': 'Стейкинг',
+                'order': 'Ордер'
+            };
+            return typeNames[type] || 'Другое';
+        }
+
+        function exportTransactions() {
+            const transactions = JSON.parse(localStorage.getItem('userTransactions')) || [];
+            
+            let exportData = `Транзакции KriptoExchange\n`;
+            exportData += `Дата экспорта: ${new Date().toLocaleDateString('ru-RU')}\n\n`;
+            
+            if (transactions.length > 0) {
+                exportData += `Транзакции:\n\n`;
+                transactions.forEach((transaction, index) => {
+                    exportData += `${index + 1}. ${transaction.title}\n`;
+                    exportData += `   Тип: ${getTransactionTypeName(transaction.type)}\n`;
+                    exportData += `   Сумма: ${formatTransactionAmount(transaction)}\n`;
+                    if (transaction.usdAmount) {
+                        exportData += `   USD: $${formatCurrency(transaction.usdAmount)}\n`;
+                    }
+                    exportData += `   Дата: ${new Date(transaction.timestamp).toLocaleString('ru-RU')}\n`;
+                    exportData += `   ID: ${transaction.id}\n\n`;
+                });
+            } else {
+                exportData += `История транзакций пуста\n`;
+            }
+            
+            // Создаем файл для скачивания
+            const blob = new Blob([exportData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'transactions.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Успешно', 'Транзакции экспортированы', 'success');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function navigateToPage(page) {
+            if (page === 'home') {
+                window.location.href = 'index.html';
+            } else if (page === 'coins') {
+                window.location.href = 'coins.html';
+            } else if (page === 'portfolio') {
+                window.location.href = 'portfolio.html';
+            } else if (page === 'settings') {
+                window.location.href = 'settings.html';
+            }
+        }
+    </script>
+</body>
+
+</html> 

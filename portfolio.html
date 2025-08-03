@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Портфель - KriptoExchange</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-title">Портфель</h1>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" onclick="exportPortfolio()">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Portfolio Overview -->
+            <section class="portfolio-overview">
+                <div class="portfolio-card">
+                    <div class="portfolio-header">
+                        <span class="portfolio-label">Общая стоимость</span>
+                    </div>
+                    <div class="portfolio-amount" id="totalPortfolioValue">$0.00</div>
+                    <div class="portfolio-change" id="portfolioChange">
+                        <i class="fas fa-minus"></i>
+                        $0.00 (0.00%)
+                    </div>
+                </div>
+            </section>
+
+            <!-- Portfolio Analytics -->
+            <section class="portfolio-analytics">
+                <div class="analytics-header">
+                    <h2>Аналитика портфеля</h2>
+                </div>
+                <div class="analytics-content">
+                    <div class="analytics-row">
+                        <div class="analytics-metric">
+                            <div class="metric-label">Всего активов</div>
+                            <div class="metric-value" id="totalAssets">0</div>
+                            <div class="metric-period">шт</div>
+                            </div>
+                        <div class="analytics-metric">
+                            <div class="metric-label">Активных ставок</div>
+                            <div class="metric-value" id="activeStakesCount">0</div>
+                            <div class="metric-period">шт</div>
+                        </div>
+                        <div class="analytics-metric">
+                            <div class="metric-label">Доступно</div>
+                            <div class="metric-value" id="availableBalance">$0.00</div>
+                            <div class="metric-period">USD</div>
+                        </div>
+                    </div>
+                    <div class="analytics-row">
+                        <div class="analytics-metric">
+                            <div class="metric-label">Изменение за 24ч</div>
+                            <div class="metric-value" id="dailyChange">0.00%</div>
+                            <div class="metric-period">24ч</div>
+                        </div>
+                        <div class="analytics-metric">
+                            <div class="metric-label">Изменение за 7д</div>
+                            <div class="metric-value" id="weeklyChange">0.00%</div>
+                            <div class="metric-period">7д</div>
+                        </div>
+                        <div class="analytics-metric">
+                            <div class="metric-label">Изменение за 30д</div>
+                            <div class="metric-value" id="monthlyChange">0.00%</div>
+                            <div class="metric-period">30д</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Asset Allocation -->
+            <section class="asset-allocation">
+                <div class="section-header">
+                    <h2>Распределение активов</h2>
+                </div>
+                <div class="allocation-chart">
+                    <div class="chart-placeholder">
+                        <i class="fas fa-pie-chart"></i>
+                        <p>График распределения активов</p>
+                    </div>
+                </div>
+                <div class="allocation-list" id="allocationList">
+                    <!-- Asset allocation will be loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Performance History -->
+            <section class="performance-history">
+                <div class="section-header">
+                    <h2>История производительности</h2>
+                    <div class="time-filter">
+                        <button class="time-btn active" data-period="1D">1Д</button>
+                        <button class="time-btn" data-period="1W">1Н</button>
+                        <button class="time-btn" data-period="1M">1М</button>
+                        <button class="time-btn" data-period="3M">3М</button>
+                        <button class="time-btn" data-period="1Y">1Г</button>
+                    </div>
+                </div>
+                <div class="performance-chart">
+                    <canvas id="performanceChart" style="width: 100%; height: 100%;"></canvas>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn" data-page="coins">
+                <i class="fas fa-coins"></i>
+                <span>Монеты</span>
+            </button>
+            <button class="nav-btn active" data-page="portfolio">
+                <i class="fas fa-briefcase"></i>
+                <span>Портфель</span>
+            </button>
+            <button class="nav-btn" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+    <script>
+        let performanceChart = null;
+
+        // Инициализация страницы портфеля
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const savedUser = localStorage.getItem('currentUser');
+            if (!savedUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            initializePortfolio();
+            initializeTimeFilters();
+            initializeNavigation();
+            
+            // Обновляем данные каждые 10 секунд
+            setInterval(updatePortfolioData, 10000);
+        });
+
+        function initializePortfolio() {
+            updatePortfolioData();
+            initializePerformanceChart();
+        }
+
+        function updatePortfolioData() {
+            // Загружаем данные пользователя
+            const userBalance = parseFloat(localStorage.getItem('userBalance')) || 0;
+            const userAssets = JSON.parse(localStorage.getItem('userAssets')) || [];
+            const activeStakes = JSON.parse(localStorage.getItem('activeStakes')) || [];
+            
+            // Рассчитываем общую стоимость портфеля
+            let totalValue = userBalance;
+            userAssets.forEach(userAsset => {
+                const assetData = assets.find(a => a.id === userAsset.id);
+                if (assetData) {
+                    totalValue += userAsset.balance * assetData.price;
+                }
+            });
+
+            // Обновляем отображение
+            document.getElementById('totalPortfolioValue').textContent = `$${formatCurrency(totalValue)}`;
+            document.getElementById('availableBalance').textContent = `$${formatCurrency(userBalance)}`;
+            document.getElementById('totalAssets').textContent = userAssets.filter(asset => asset.balance > 0).length;
+            document.getElementById('activeStakesCount').textContent = activeStakes.filter(stake => !stake.completed).length;
+
+            // Рассчитываем изменения
+            const dailyChange = calculatePortfolioChange(1);
+            const weeklyChange = calculatePortfolioChange(7);
+            const monthlyChange = calculatePortfolioChange(30);
+
+            updateChangeDisplay('dailyChange', dailyChange);
+            updateChangeDisplay('weeklyChange', weeklyChange);
+            updateChangeDisplay('monthlyChange', monthlyChange);
+
+            // Обновляем общее изменение портфеля
+            const totalChange = totalValue - userBalance;
+            const changePercent = userBalance > 0 ? (totalChange / userBalance) * 100 : 0;
+            
+            const portfolioChangeEl = document.getElementById('portfolioChange');
+            if (totalChange >= 0) {
+                portfolioChangeEl.innerHTML = `<i class="fas fa-arrow-up"></i> +$${formatCurrency(totalChange)} (+${changePercent.toFixed(2)}%)`;
+                portfolioChangeEl.className = 'portfolio-change positive';
+            } else {
+                portfolioChangeEl.innerHTML = `<i class="fas fa-arrow-down"></i> -$${formatCurrency(Math.abs(totalChange))} (${changePercent.toFixed(2)}%)`;
+                portfolioChangeEl.className = 'portfolio-change negative';
+            }
+
+            // Обновляем распределение активов
+            updateAssetAllocation(userAssets);
+        }
+
+        function calculatePortfolioChange(days) {
+            // Упрощенный расчет изменения за период
+            const transactions = JSON.parse(localStorage.getItem('userTransactions')) || [];
+            const cutoffTime = Date.now() - (days * 24 * 60 * 60 * 1000);
+            
+            const recentTransactions = transactions.filter(t => t.timestamp >= cutoffTime);
+            const totalChange = recentTransactions.reduce((sum, t) => sum + t.amount, 0);
+            
+            const userBalance = parseFloat(localStorage.getItem('userBalance')) || 0;
+            return userBalance > 0 ? (totalChange / userBalance) * 100 : 0;
+        }
+
+        function updateChangeDisplay(elementId, change) {
+            const element = document.getElementById(elementId);
+            element.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+            element.className = `metric-value ${change >= 0 ? 'positive' : 'negative'}`;
+        }
+
+        function updateAssetAllocation(userAssets) {
+            const allocationList = document.getElementById('allocationList');
+            if (!allocationList) return;
+
+            if (userAssets.length === 0) {
+                allocationList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-coins"></i>
+                        <p>У вас пока нет активов</p>
+                        <button class="text-btn" onclick="window.location.href='coins.html'">Купить активы</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Рассчитываем общую стоимость для определения процентов
+            let totalValue = 0;
+            const assetsWithValue = userAssets.map(userAsset => {
+                const assetData = assets.find(a => a.id === userAsset.id);
+                if (assetData) {
+                    const value = userAsset.balance * assetData.price;
+                    totalValue += value;
+                    return {
+                        ...userAsset,
+                        ...assetData,
+                        value: value
+                    };
+                }
+                return null;
+            }).filter(Boolean);
+
+            // Сортируем по стоимости
+            assetsWithValue.sort((a, b) => b.value - a.value);
+
+            allocationList.innerHTML = assetsWithValue.map(asset => {
+                const percentage = totalValue > 0 ? (asset.value / totalValue) * 100 : 0;
+                
+                return `
+                    <div class="allocation-item">
+                        <div class="allocation-info">
+                            <div class="allocation-color" style="background: ${asset.color}"></div>
+                            <div class="allocation-details">
+                                <div class="allocation-name">${asset.name}</div>
+                                <div class="allocation-percentage">${percentage.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        <div class="allocation-value">$${formatCurrency(asset.value)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function initializePerformanceChart() {
+            const canvas = document.getElementById('performanceChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Генерируем данные для графика производительности
+            const labels = [];
+            const data = [];
+            const now = new Date();
+            
+            for (let i = 30; i >= 0; i--) {
+                const date = new Date(now);
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' }));
+                
+                // Генерируем реалистичные данные портфеля
+                const baseValue = 10000; // Базовая стоимость портфеля
+                const variation = (Math.random() - 0.5) * 0.05; // ±2.5%
+                data.push(baseValue * (1 + variation));
+            }
+
+            try {
+                performanceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Стоимость портфеля',
+                            data: data,
+                            borderColor: '#007aff',
+                            backgroundColor: '#007aff20',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#007aff',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#8e8e93',
+                                    maxTicksLimit: 7
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: '#2c2c2e'
+                                },
+                                ticks: {
+                                    color: '#8e8e93',
+                                    callback: function(value) {
+                                        return '$' + (value / 1000).toFixed(0) + 'K';
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing chart:', error);
+                // Показываем placeholder если график не загрузился
+                const chartContainer = document.querySelector('.performance-chart');
+                if (chartContainer) {
+                    chartContainer.innerHTML = `
+                        <div class="chart-placeholder">
+                            <i class="fas fa-chart-line"></i>
+                            <p>График временно недоступен</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function initializeTimeFilters() {
+            const timeButtons = document.querySelectorAll('.time-btn');
+            timeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    timeButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const period = this.dataset.period;
+                    updatePerformanceChart(period);
+                });
+            });
+        }
+
+        function updatePerformanceChart(period) {
+            if (!performanceChart) return;
+
+            // Генерируем новые данные в зависимости от периода
+            const labels = [];
+            const data = [];
+            const now = new Date();
+            
+            let days = 30;
+            if (period === '1D') days = 1;
+            else if (period === '1W') days = 7;
+            else if (period === '1M') days = 30;
+            else if (period === '3M') days = 90;
+            else if (period === '1Y') days = 365;
+            
+            for (let i = days; i >= 0; i--) {
+                const date = new Date(now);
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' }));
+                
+                const baseValue = 10000;
+                const variation = (Math.random() - 0.5) * 0.05;
+                data.push(baseValue * (1 + variation));
+            }
+
+            performanceChart.data.labels = labels;
+            performanceChart.data.datasets[0].data = data;
+            performanceChart.update();
+        }
+
+        function initializeNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const page = button.dataset.page;
+                    navigateToPage(page);
+                });
+            });
+        }
+
+        function exportPortfolio() {
+            const userBalance = parseFloat(localStorage.getItem('userBalance')) || 0;
+            const userAssets = JSON.parse(localStorage.getItem('userAssets')) || [];
+            
+            let portfolioData = `Портфель KriptoExchange\n`;
+            portfolioData += `Дата: ${new Date().toLocaleDateString('ru-RU')}\n\n`;
+            portfolioData += `Доступный баланс: $${formatCurrency(userBalance)}\n\n`;
+            
+            if (userAssets.length > 0) {
+                portfolioData += `Активы:\n`;
+                userAssets.forEach(asset => {
+                    const assetData = assets.find(a => a.id === asset.id);
+                    if (assetData) {
+                        const value = asset.balance * assetData.price;
+                        portfolioData += `${assetData.name}: ${asset.balance.toFixed(8)} ${assetData.symbol} ($${formatCurrency(value)})\n`;
+                    }
+                });
+            }
+            
+            // Создаем файл для скачивания
+            const blob = new Blob([portfolioData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'portfolio.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Успешно', 'Портфель экспортирован', 'success');
+        }
+
+        function navigateToPage(page) {
+            if (page === 'home') {
+            window.location.href = 'index.html';
+            } else if (page === 'coins') {
+                window.location.href = 'coins.html';
+            } else if (page === 'portfolio') {
+                window.location.href = 'portfolio.html';
+            } else if (page === 'settings') {
+                window.location.href = 'settings.html';
+            }
+        }
+    </script>
+</body>
+
+</html>

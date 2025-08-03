@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все активы - KriptoExchange</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="icon-btn back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="app-title">Все активы</h1>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" onclick="toggleSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="icon-btn" onclick="toggleFilter()">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-bar" id="searchBar" style="display: none;">
+            <input type="text" placeholder="Поиск активов..." id="searchInput">
+            <button class="icon-btn" onclick="clearSearch()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Category Tabs -->
+            <section class="category-tabs">
+                <div class="category-tabs-container">
+                    <button class="category-tab active" data-category="crypto">
+                        <i class="fas fa-coins"></i>
+                        Криптовалюты
+                    </button>
+                    <button class="category-tab" data-category="stocks">
+                        <i class="fas fa-chart-line"></i>
+                        Акции
+                    </button>
+                    <button class="category-tab" data-category="commodities">
+                        <i class="fas fa-oil-can"></i>
+                        Ресурсы
+                    </button>
+                </div>
+            </section>
+
+            <!-- Crypto Assets -->
+            <section class="assets-category active" id="crypto">
+                <div class="assets-list">
+                    <div class="asset-item" onclick="openAssetDetails('BTC')">
+                        <div class="asset-info">
+                            <div class="asset-icon bitcoin">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Bitcoin</div>
+                                <div class="asset-symbol">BTC</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$43,250.50</div>
+                            <div class="asset-change positive">+2.4%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('ETH')">
+                        <div class="asset-info">
+                            <div class="asset-icon ethereum">
+                                <i class="fab fa-ethereum"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Ethereum</div>
+                                <div class="asset-symbol">ETH</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$2,850.75</div>
+                            <div class="asset-change positive">+1.8%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('SOL')">
+                        <div class="asset-info">
+                            <div class="asset-icon solana">
+                                <i class="fas fa-sun"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Solana</div>
+                                <div class="asset-symbol">SOL</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$100.25</div>
+                            <div class="asset-change positive">+3.2%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('BNB')">
+                        <div class="asset-info">
+                            <div class="asset-icon bnb">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">BNB</div>
+                                <div class="asset-symbol">BNB</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$315.80</div>
+                            <div class="asset-change negative">-0.5%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('ADA')">
+                        <div class="asset-info">
+                            <div class="asset-icon cardano">
+                                <i class="fas fa-diamond"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Cardano</div>
+                                <div class="asset-symbol">ADA</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$0.45</div>
+                            <div class="asset-change positive">+1.2%</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stocks Assets -->
+            <section class="assets-category" id="stocks">
+                <div class="assets-list">
+                    <div class="asset-item" onclick="openAssetDetails('AAPL')">
+                        <div class="asset-info">
+                            <div class="asset-icon apple">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Apple Inc.</div>
+                                <div class="asset-symbol">AAPL</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$185.30</div>
+                            <div class="asset-change positive">+1.2%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('TSLA')">
+                        <div class="asset-info">
+                            <div class="asset-icon tesla">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Tesla</div>
+                                <div class="asset-symbol">TSLA</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$245.50</div>
+                            <div class="asset-change positive">+2.8%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('GOOGL')">
+                        <div class="asset-info">
+                            <div class="asset-icon google">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Alphabet Inc.</div>
+                                <div class="asset-symbol">GOOGL</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$142.80</div>
+                            <div class="asset-change negative">-0.3%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('MSFT')">
+                        <div class="asset-info">
+                            <div class="asset-icon microsoft">
+                                <i class="fab fa-microsoft"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Microsoft</div>
+                                <div class="asset-symbol">MSFT</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$380.25</div>
+                            <div class="asset-change positive">+0.8%</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Commodities Assets -->
+            <section class="assets-category" id="commodities">
+                <div class="assets-list">
+                    <div class="asset-item" onclick="openAssetDetails('GOLD')">
+                        <div class="asset-info">
+                            <div class="asset-icon gold">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Золото</div>
+                                <div class="asset-symbol">GOLD</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$2,150.00</div>
+                            <div class="asset-change positive">+0.5%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('SILVER')">
+                        <div class="asset-info">
+                            <div class="asset-icon silver">
+                                <i class="fas fa-ring"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Серебро</div>
+                                <div class="asset-symbol">SILVER</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$24.50</div>
+                            <div class="asset-change positive">+1.1%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('OIL')">
+                        <div class="asset-info">
+                            <div class="asset-icon oil">
+                                <i class="fas fa-oil-can"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Нефть Brent</div>
+                                <div class="asset-symbol">OIL</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$78.45</div>
+                            <div class="asset-change positive">+0.5%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item" onclick="openAssetDetails('COPPER')">
+                        <div class="asset-info">
+                            <div class="asset-icon copper">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">Медь</div>
+                                <div class="asset-symbol">COPPER</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$4.25</div>
+                            <div class="asset-change negative">-0.2%</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn" data-page="trading">
+                <i class="fas fa-chart-line"></i>
+                <span>Торговля</span>
+            </button>
+            <button class="nav-btn" data-page="portfolio">
+                <i class="fas fa-briefcase"></i>
+                <span>Портфель</span>
+            </button>
+            <button class="nav-btn" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        function toggleSearch() {
+            const searchBar = document.getElementById('searchBar');
+            searchBar.style.display = searchBar.style.display === 'none' ? 'flex' : 'none';
+        }
+        
+        function toggleFilter() {
+            console.log('Открыть фильтры');
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchBar').style.display = 'none';
+        }
+        
+        function openAssetDetails(symbol) {
+            window.location.href = `asset-details.html?symbol=${symbol}`;
+        }
+        
+        // Category tabs
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const assetCategories = document.querySelectorAll('.assets-category');
+            
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    
+                    // Remove active class from all tabs and categories
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    assetCategories.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding category
+                    this.classList.add('active');
+                    document.getElementById(category).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KriptoExchange</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Login/Register Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-content">
+            <div class="auth-header">
+                <h2>Добро пожаловать в KriptoExchange</h2>
+                <p>Войдите или зарегистрируйтесь для начала работы</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Вход</button>
+                <button class="auth-tab" data-tab="register">Регистрация</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm" data-tab="login">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="Введите пароль" required>
+                </div>
+                <button type="submit" class="auth-btn">Войти</button>
+            </form>
+            
+            <!-- Register Form -->
+            <form class="auth-form" id="registerForm" data-tab="register">
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" id="registerName" placeholder="Ваше имя" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="registerPassword" placeholder="Минимум 6 символов" required>
+                </div>
+                <div class="form-group">
+                    <label>Подтвердите пароль</label>
+                    <input type="password" id="registerPasswordConfirm" placeholder="Повторите пароль" required>
+                </div>
+                <button type="submit" class="auth-btn">Зарегистрироваться</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="app-container" id="appContainer" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-title">KriptoExchange</h1>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Balance Section -->
+            <section class="balance-section">
+                <div class="balance-card">
+                    <div class="balance-header">
+                        <span class="balance-label">Общий баланс</span>
+                        <button class="icon-btn eye-btn">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="balance-amount" id="totalBalance">$0.00</div>
+                    <div class="balance-change" id="balanceChange">
+                        <i class="fas fa-minus"></i>
+                        $0.00 (0.00%)
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-btn primary" onclick="openDepositModal()">
+                        <i class="fas fa-plus"></i>
+                        Пополнить
+                    </button>
+                    <button class="action-btn secondary" onclick="openWithdrawModal()">
+                        <i class="fas fa-arrow-up"></i>
+                        Вывести
+                    </button>
+                    <button class="action-btn secondary" onclick="openP2PModal()">
+                        <i class="fas fa-exchange-alt"></i>
+                        P2P
+                    </button>
+                </div>
+            </section>
+
+            <!-- Quick Stats -->
+            <section class="stats-section">
+                <div class="main-stats-center">
+                    <div class="stat-block">
+                        <div class="stat-value" id="monthlyChange">0.00%</div>
+                        <div class="stat-label">За месяц</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-value" id="assetsCount">0</div>
+                        <div class="stat-label">Активов</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-value" id="activeStakes">0</div>
+                        <div class="stat-label">Активных ставок</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top Assets -->
+            <section class="assets-section">
+                <div class="section-header">
+                    <h2>Топ активов</h2>
+                    <button class="text-btn" onclick="window.location.href='coins.html'">Все активы</button>
+                </div>
+                <div class="assets-list" id="topAssets">
+                    <!-- Assets will be loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Recent Transactions -->
+            <section class="transactions-section">
+                <div class="section-header">
+                    <h2>Последние операции</h2>
+                    <button class="text-btn" onclick="window.location.href='transactions.html'">Все операции</button>
+                </div>
+                <div class="transactions-list" id="recentTransactions">
+                    <!-- Transactions will be loaded dynamically -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn" data-page="coins">
+                <i class="fas fa-coins"></i>
+                <span>Монеты</span>
+            </button>
+            <button class="nav-btn" data-page="portfolio">
+                <i class="fas fa-briefcase"></i>
+                <span>Портфель</span>
+            </button>
+            <button class="nav-btn" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div class="modal" id="depositModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Пополнить баланс</h3>
+                <button class="icon-btn" onclick="closeModal('depositModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="depositForm">
+                    <div class="form-group">
+                        <label>Сумма (USD)</label>
+                        <input type="number" id="depositAmount" placeholder="0.00" min="1" step="0.01" required>
+                    </div>
+                    <button type="submit" class="trade-btn primary">Пополнить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal" id="withdrawModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Вывести средства</h3>
+                <button class="icon-btn" onclick="closeModal('withdrawModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="withdrawForm">
+                    <div class="form-group">
+                        <label>Сумма (USD)</label>
+                        <input type="number" id="withdrawAmount" placeholder="0.00" min="1" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Максимум доступно: <span id="maxWithdraw">$0.00</span></label>
+                    </div>
+                    <button type="submit" class="trade-btn primary">Вывести</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

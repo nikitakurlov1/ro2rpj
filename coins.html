@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Активы - KriptoExchange</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-title">Активы</h1>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" onclick="openFilters()">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" placeholder="Поиск активов..." id="searchInput">
+            <button class="icon-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+            <div class="category-tabs-container">
+                <button class="category-tab active" data-category="all">
+                    <i class="fas fa-coins"></i>
+                    Все
+                </button>
+                <button class="category-tab" data-category="crypto">
+                    <i class="fab fa-bitcoin"></i>
+                    Криптовалюты
+                </button>
+                <button class="category-tab" data-category="stocks">
+                    <i class="fas fa-chart-line"></i>
+                    Акции
+                </button>
+                <button class="category-tab" data-category="commodities">
+                    <i class="fas fa-gem"></i>
+                    Товары
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Crypto Assets -->
+            <div class="assets-category active" data-category="crypto">
+                <div class="assets-list" id="cryptoAssets">
+                    <!-- Crypto assets will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Stock Assets -->
+            <div class="assets-category" data-category="stocks">
+                <div class="assets-list" id="stockAssets">
+                    <!-- Stock assets will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Commodity Assets -->
+            <div class="assets-category" data-category="commodities">
+                <div class="assets-list" id="commodityAssets">
+                    <!-- Commodity assets will be loaded dynamically -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn active" data-page="coins">
+                <i class="fas fa-coins"></i>
+                <span>Монеты</span>
+            </button>
+            <button class="nav-btn" data-page="portfolio">
+                <i class="fas fa-briefcase"></i>
+                <span>Портфель</span>
+            </button>
+            <button class="nav-btn" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // Инициализация страницы активов
+        document.addEventListener('DOMContentLoaded', function () {
+            // Проверяем авторизацию
+            const savedUser = localStorage.getItem('currentUser');
+            if (!savedUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            initializeAssets();
+            initializeSearch();
+            initializeCategoryTabs();
+            initializeNavigation();
+
+            // Обновляем цены каждые 5 секунд
+            setInterval(updateAssetPrices, 5000);
+        });
+
+        function initializeAssets() {
+            // Загружаем данные пользователя
+            const userAssets = JSON.parse(localStorage.getItem('userAssets')) || [];
+
+            // Группируем активы по категориям (добавим больше активов для видимости)
+            const cryptoAssets = assets.filter(a => ['bitcoin', 'ethereum', 'bnb', 'cardano', 'solana'].includes(a.id));
+            // Добавим больше крипто-активов для примера
+            cryptoAssets.push(
+                { id: 'tron', name: 'TRON', symbol: 'TRX', icon: 'fas fa-bolt', color: '#ff6600', price: 0.12, change: 0.5, balance: 0 },
+                { id: 'dogecoin', name: 'Dogecoin', symbol: 'DOGE', icon: 'fab fa-docker', color: '#c2a633', price: 0.08, change: 1.1, balance: 0 },
+                { id: 'polkadot', name: 'Polkadot', symbol: 'DOT', icon: 'fas fa-dot-circle', color: '#e6007a', price: 6.5, change: -0.7, balance: 0 }
+            );
+            const stockAssets = assets.filter(a => ['apple', 'tesla', 'google', 'microsoft'].includes(a.id));
+            stockAssets.push(
+                { id: 'amazon', name: 'Amazon', symbol: 'AMZN', icon: 'fab fa-amazon', color: '#ff9900', price: 130, change: 0.9, balance: 0 },
+                { id: 'meta', name: 'Meta Platforms', symbol: 'META', icon: 'fab fa-facebook', color: '#4267B2', price: 320, change: 1.3, balance: 0 }
+            );
+            const commodityAssets = assets.filter(a => ['gold', 'silver', 'copper'].includes(a.id));
+            commodityAssets.push(
+                { id: 'platinum', name: 'Platinum', symbol: 'XPT', icon: 'fas fa-gem', color: '#e5e4e2', price: 950, change: 0.2, balance: 0 },
+                { id: 'oil', name: 'Oil', symbol: 'OIL', icon: 'fas fa-oil-can', color: '#222', price: 75, change: -0.4, balance: 0 }
+            );
+            // Отображаем активы
+            displayAssets('cryptoAssets', cryptoAssets, userAssets);
+            displayAssets('stockAssets', stockAssets, userAssets);
+            displayAssets('commodityAssets', commodityAssets, userAssets);
+        }
+
+        function displayAssets(containerId, assetList, userAssets) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = assetList.map(asset => {
+                const userAsset = userAssets.find(ua => ua.id === asset.id);
+                const balance = userAsset ? userAsset.balance : 0;
+                const balanceValue = balance * asset.price;
+
+                return `
+                    <div class="asset-item" onclick="openAssetDetails('${asset.id}')">
+                        <div class="asset-info">
+                            <div class="asset-icon" style="background: ${asset.color}">
+                                <i class="${asset.icon}"></i>
+                            </div>
+                            <div class="asset-details">
+                                <div class="asset-name">${asset.name}</div>
+                                <div class="asset-balance">${balance > 0 ? `${balance.toFixed(8)} ${asset.symbol}` : '0.00000000 ' + asset.symbol}</div>
+                            </div>
+                        </div>
+                        <div class="asset-values">
+                            <div class="asset-price">$${formatCurrency(asset.price)}</div>
+                            <div class="asset-change ${asset.change >= 0 ? 'positive' : 'negative'}">
+                                ${asset.change >= 0 ? '+' : ''}${asset.change.toFixed(1)}%
+                            </div>
+                            ${balanceValue > 0 ? `<div class="asset-balance-value">$${formatCurrency(balanceValue)}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateAssetPrices() {
+            // Обновляем цены активов
+            assets.forEach(asset => {
+                const changePercent = (Math.random() - 0.5) * 2; // -1% до +1%
+                asset.price *= (1 + changePercent / 100);
+                asset.change = changePercent;
+            });
+
+            // Перезагружаем отображение
+            const userAssets = JSON.parse(localStorage.getItem('userAssets')) || [];
+            const cryptoAssets = assets.filter(a => ['bitcoin', 'ethereum', 'bnb', 'cardano', 'solana'].includes(a.id));
+            const stockAssets = assets.filter(a => ['apple', 'tesla', 'google', 'microsoft'].includes(a.id));
+            const commodityAssets = assets.filter(a => ['gold', 'silver', 'copper'].includes(a.id));
+
+            displayAssets('cryptoAssets', cryptoAssets, userAssets);
+            displayAssets('stockAssets', stockAssets, userAssets);
+            displayAssets('commodityAssets', commodityAssets, userAssets);
+        }
+
+        function initializeSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function () {
+                const query = this.value.toLowerCase();
+                filterAssets(query);
+            });
+        }
+
+        function filterAssets(query) {
+            const assetItems = document.querySelectorAll('.asset-item');
+
+            assetItems.forEach(item => {
+                const assetName = item.querySelector('.asset-name').textContent.toLowerCase();
+                const assetSymbol = item.querySelector('.asset-balance').textContent.toLowerCase();
+
+                if (assetName.includes(query) || assetSymbol.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function initializeCategoryTabs() {
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const assetCategories = document.querySelectorAll('.assets-category');
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    const category = this.dataset.category;
+                    // Убираем активный класс со всех вкладок
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    assetCategories.forEach(c => c.classList.remove('active'));
+                    // Добавляем активный класс к выбранной вкладке и категории
+                    this.classList.add('active');
+                    document.querySelector('.assets-category[data-category="' + category + '"]').classList.add('active');
+                });
+            });
+        }
+
+        function initializeNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const page = button.dataset.page;
+                    navigateToPage(page);
+                });
+            });
+        }
+
+        function openAssetDetails(assetId) {
+            window.location.href = `asset-details.html?asset=${assetId}`;
+        }
+
+        function openFilters() {
+            showToast('Информация', 'Фильтры будут доступны в ближайшее время', 'info');
+        }
+
+        function navigateToPage(page) {
+            if (page === 'home') {
+                window.location.href = 'index.html';
+            } else if (page === 'coins') {
+                window.location.href = 'coins.html';
+            } else if (page === 'portfolio') {
+                window.location.href = 'portfolio.html';
+            } else if (page === 'settings') {
+                window.location.href = 'settings.html';
+            }
+        }
+    </script>
+</body>
+
+</html>
